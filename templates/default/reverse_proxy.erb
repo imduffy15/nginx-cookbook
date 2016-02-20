@@ -1,0 +1,52 @@
+
+<% if @resource.ssl %>
+server {
+  <% @resource.http_ports.each do |port| %>
+  listen <%= port %>;
+  <% end %>
+
+  server_name <%= @resource.http_server_name %>;
+
+  location / {
+    if ($http_x_forwarded_proto != 'https') {
+      return 301 https://<%= @resource.host %>$request_uri;
+    }
+  }
+}
+
+server {
+  <% @resource.https_ports.each do |port| %>
+  listen <%= port %>;
+  <% end %>
+
+  server_name <%= @resource.https_server_name %>;
+
+  ssl on;
+  ssl_certificate <%= @resource.host %>.pem;
+  ssl_certificate_key <%= @resource.host %>.key;
+
+  location / {
+    proxy_pass http://<%= @resource.application_host %>:<%= @resource.application_port %>;
+    proxy_set_header HOST $host:$server_port;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_redirect default;
+  }
+}
+<% else %>
+server {
+  <% @resource.http_ports.each do |port| %>
+  listen <%= port %>;
+  <% end %>
+  server_name <%= @resource.http_server_name %>;
+
+  location / {
+    proxy_pass http://<%= @resource.application_host %>:<%= @resource.application_port %>;
+    proxy_set_header HOST $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_redirect default;
+  }
+}
+<% end %>
