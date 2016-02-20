@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: nginx
-# Recipe:: default
+# Cookbook Name:: artifactory
+# Recipe:: _repository_configuration
 #
 # Copyright 2016 Ian Duffy
 #
@@ -16,6 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'nginx::_repository_configuration'
-include_recipe 'nginx::_installation'
-include_recipe 'nginx::_configuration'
+yum_repository node['nginx']['repository']['name'] do
+  description node['nginx']['repository']['description']
+  baseurl node['nginx']['repository']['url']
+  gpgcheck false
+  action :create
+end

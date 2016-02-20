@@ -13,4 +13,5 @@ end
 source_url 'https://github.com/imduffy15/nginx-cookbook' if respond_to?(:source_url)
 issues_url 'https://github.com/imduffy15/nginx-cookbook/issues' if respond_to?(:issues_url)
 
+depends 'yum', '3.10.0'
 depends 'selinux_policy', '0.9.2'
